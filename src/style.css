@@ -1,0 +1,40 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    font-family: sans-serif;
+}
+
+body {
+    background-color: #333;
+    color: #fff;
+}
+
+input {
+    padding: 10px;
+    background-color: #555;
+    border: none;
+    color: #fff;
+    border-radius: 10px;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    height: 40px;
+    width: 40px;
+    box-sizing: border-box;
+    vertical-align: top;
+    margin: 0 10px;
+    background-color: #555;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #666;
+}
+
+button svg {
+    fill: #fff;
+}
