@@ -40,7 +40,7 @@ iframe {
   height: calc(100% - 35px);
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 900px) {
   .preview-popup {
     width: 100%;
     height: 100%;

@@ -47,7 +47,6 @@ defineProps({
   width: 500px;
   height: 250px;
   align-content: flex-start;
-  max-width: 500px;
 }
 
 .files > li {
@@ -79,7 +78,7 @@ defineProps({
   cursor: pointer;
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 900px) {
   .files {
     width: auto;
   }

@@ -277,7 +277,7 @@ function closePreview() {
   width: 120px;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 900px) {
   .main-window {
     width: 100vw;
   }
