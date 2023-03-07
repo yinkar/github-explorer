@@ -37,6 +37,20 @@ function setAddress() {
   
   const repoNameArray = repo.value.split('/');
 
+  const getCached = () => {
+      const cachedData = window.localStorage.getItem(address.value);
+
+      if (cachedData) {
+        list.value.splice(0);
+        list.value.push(...JSON.parse(cachedData));
+
+        loading.value = false;
+        return true;
+      }
+      
+      return false;
+    };
+
   if (repoNameArray.length === 0) return;
 
   // Get repos on user
@@ -44,7 +58,10 @@ function setAddress() {
     const username = repoNameArray.at(0);
 
     loading.value = true;
+    
     (async () => {
+      if (getCached()) return;
+
       try {
         const response = await fetch(`https://api.github.com/users/${username}/repos`);
         const data = await response.json();
@@ -60,6 +77,8 @@ function setAddress() {
           return (b.type > a.type) ? -1 : (a.type > b.type) ? 1 : 0;
         }));
 
+        window.localStorage.setItem(address.value, JSON.stringify(list.value));
+
         loading.value = false;
       }
       catch(e) {
@@ -67,10 +86,13 @@ function setAddress() {
       }
     })();
 
+    window.location.hash = `${repo.value}/${path.value}`;
     return;
   }
 
   (async () => {
+    if (getCached()) return;
+    
     try {
       const response = await fetch(`https://api.github.com/repos/${address.value}`);
       const data = await response.json();
@@ -80,14 +102,18 @@ function setAddress() {
         return (b.type > a.type) ? -1 : (a.type > b.type) ? 1 : 0;
       }));
 
+      window.localStorage.setItem(address.value, JSON.stringify(list.value));
+
       loading.value = false;
     }
     catch(e) {
       error.value = true;
     }
+    
+    window.location.hash = `${repo.value}/${path.value}`;
+    return;
   })();
 
-  window.location.hash = `${repo.value}/${path.value}`;
 }
 
 function openRepo(repoPath) {
@@ -109,18 +135,19 @@ function toUp() {
 
   if (pathArray.length === 1 && pathArray.at(0) === '') {
     const repoNameArray = repo.value.split('/');
-    if (repoNameArray.length <= 1) return;
+
+    if (repoNameArray.length <= 1) {    
+      setAddress();
+      return;
+    };
 
     repoBox.value.value = repoNameArray.at(0);
     setAddress();
-    
     return;
   }
 
   pathArray.splice(-1);
-
   pathBox.value.value = pathArray.join('/');
-
   setAddress();
 }
 
@@ -138,7 +165,6 @@ onMounted(() => {
     pathBox.value.value = hashArray.splice(2).join('/');
     repoBox.value.value = hashArray.join('/');
   }
-
 
   setAddress();
 });
