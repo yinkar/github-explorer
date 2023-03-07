@@ -16,7 +16,7 @@ const visibleAddress = computed(() => {
   const repoNameArray = repo.value.split('/');
 
   if (repoNameArray.length < 2) return `[${repo.value}]`;
-  if (path.value === '') return `[${repo.value}]/`;
+  if (path.value === '') return `[${repo.value}]`;
   
   return `[${repo.value}] > ${path.value.replaceAll('/', ' > ')}`;
 });
@@ -86,6 +86,8 @@ function setAddress() {
       error.value = true;
     }
   })();
+
+  window.location.hash = `${repo.value}/${path.value}`;
 }
 
 function openRepo(repoPath) {
@@ -128,6 +130,16 @@ function closeAlert() {
 }
 
 onMounted(() => {
+  if (window.location.hash !== '') {
+    const hashArray = window.location.hash.substring(1).split('/');
+
+    if (hashArray.length < 2) return;
+
+    pathBox.value.value = hashArray.splice(2).join('/');
+    repoBox.value.value = hashArray.join('/');
+  }
+
+
   setAddress();
 });
 </script>
