@@ -182,7 +182,7 @@ onMounted(() => {
         <div class="field-row">
           <div class="input-group">
             <label for="repo">Repo: </label>
-            <input type="text" ref="repoBox" @keypress="setRepoAndPath" v-model="repo" id="repo" required> 
+            <input type="text" ref="repoBox" @input="pathBox.value = ''" @keypress="setRepoAndPath" v-model="repo" id="repo" required> 
           </div>
 
           <div class="input-group">
@@ -262,8 +262,29 @@ onMounted(() => {
     width: 75px;
   }
 
+  .panel button, .address-bar button {
+    margin: 6px 0;
+  }
+
+  .address-bar {
+    margin-bottom: 10px;
+  }
+
   .address-bar input {
-    width: 222px;
+    width: 210px;
+    margin-right: 14px;
+  }
+
+  .loading-container {
+    margin-top: 20px;
+  }
+
+  .tabs {
+    height: calc(100vh - 160px);
+  }
+
+  .files {
+    height: calc(100vh - 190px);
   }
 }
 </style>
