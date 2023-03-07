@@ -1,8 +1,12 @@
 <script setup>
-import { ref } from 'vue'; 
+import { ref, onMounted } from 'vue'; 
 
 const repoBox = ref(null);
 const pathBox = ref(null);
+
+const loading = ref(false);
+
+const error = ref(false);
 
 const repo = ref('yinkar/ilkkanmatik');
 const path = ref('');
@@ -22,7 +26,9 @@ function setAddress() {
 
   address.value = `${repo.value}/contents/${path.value}`;
 
+  loading.value = true;
   (async () => {
+    try {
       const response = await fetch(`https://api.github.com/repos/${address.value}`);
       const data = await response.json();
 
@@ -31,94 +37,137 @@ function setAddress() {
         return (b.type > a.type) ? -1 : (a.type > b.type) ? 1 : 0;
       }));
 
-      console.log(data);
-    })();
+      loading.value = false;
+    }
+    catch(e) {
+      error.value = true;
+    }
+  })();
 }
 
-function setPath(path) {
-  pathBox.value.value = path;
+function setPath(itemPath) {
+  pathBox.value.value = itemPath;
   setAddress();
 }
 
 function openFile(url) {
    window.open(url, 'file', 'width=400,height=300');
 }
+
+function toUp() {
+  const pathArray = path.value.split('/');
+
+  if (pathArray.length === 0) return;
+
+  pathArray.splice(-1);
+
+  pathBox.value.value = pathArray.join('/');
+
+  setAddress();
+}
+
+function closeAlert() {
+  error.value = false;
+  loading.value = false;
+}
+
+onMounted(() => {
+  setAddress();
+});
 </script>
 
 <template>
-  <div class="panel">
-    <input type="text" ref="repoBox" @keypress="setRepoAndPath" v-model="repo" required>
-    /
-    <input type="text" ref="pathBox" @keypress="setRepoAndPath" v-model="path"  required>
+  <div class="main-window window active" style="max-width: 600px">
+    <div class="title-bar">
+      <div class="title-bar-text">Github Explorer</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize"></button>
+        <button aria-label="Maximize"></button>
+        <button aria-label="Close"></button>
+      </div>
+    </div>
+    <div class="window-body has-space" style="min-height: 200px;">
+      <div class="panel win7">
+        <div class="field-row">
+          <div class="input-group">
+            <label for="repo">Repo: </label>
+            <input type="text" ref="repoBox" @keypress="setRepoAndPath" v-model="repo" id="repo" required> 
+          </div>
 
-    <button @click="setAddress"><svg width="25px" height="25px" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m12.007 2c-5.518 0-9.998 4.48-9.998 9.998 0 5.517 4.48 9.997 9.998 9.997s9.998-4.48 9.998-9.997c0-5.518-4.48-9.998-9.998-9.998zm1.523 6.21s1.502 1.505 3.255 3.259c.147.147.22.339.22.531s-.073.383-.22.53c-1.753 1.754-3.254 3.258-3.254 3.258-.145.145-.335.217-.526.217-.192-.001-.384-.074-.531-.221-.292-.293-.294-.766-.003-1.057l1.977-1.977h-6.693c-.414 0-.75-.336-.75-.75s.336-.75.75-.75h6.693l-1.978-1.979c-.29-.289-.287-.762.006-1.054.147-.147.339-.221.53-.222.19 0 .38.071.524.215z" fill-rule="nonzero"/></svg></button>
-  </div>
+          <div class="input-group">
+            <label for="path">Path: </label>
+            <input type="text" ref="pathBox" @keypress="setRepoAndPath" v-model="path" id="path" required>
+          </div>
 
-  <div class="address-bar">
-    {{ address }}
-  </div>
-
-  <div>
-    <ul class="files">
-      <li v-for="item in list">
-        
-        <div class="file" v-if="item.type === 'file'" @click="openFile(item.download_url)">
-          <svg fill="#000000" height="25px" width="25px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve">
-            <g id="Blank">
-              <path d="M19.0363007,26.1436996c0,0.5522003,0.4476986,1,1,1h23.9999962c0.5522003,0,1-0.4477997,1-1s-0.4477997-1-1-1H20.0363007
-                C19.4839993,25.1436996,19.0363007,25.5914993,19.0363007,26.1436996z"/>
-              <path d="M44.0362968,35.1436996H20.0363007c-0.5523014,0-1,0.4477997-1,1s0.4476986,1,1,1h23.9999962c0.5522003,0,1-0.4477997,1-1
-                S44.5884972,35.1436996,44.0362968,35.1436996z"/>
-              <path d="M44.0362968,45.1436996H20.0363007c-0.5523014,0-1,0.4477997-1,1s0.4476986,1,1,1h23.9999962c0.5522003,0,1-0.4477997,1-1
-                S44.5884972,45.1436996,44.0362968,45.1436996z"/>
-              <path d="M56.6477966,15.6507998L41.1185989,0.1493c-0.1875-0.1875-0.4567032-0.293-0.7218018-0.293l-30.303297,0.002
-                C8.4445-0.1417,7,1.2000999,7,2.8494999v57.8754997c0,0.8359032,0.421,1.7657013,1.0128002,2.3585014
-                c0.5917997,0.5908012,1.4731998,1.0601997,2.3091002,1.0601997h43.5839958c0.7949028,0,1.6013031-0.4533005,2.1638031-1.0158005
-                C56.6311951,62.5653992,57,61.6747017,57,60.8806992V16.3577995C57,16.0926991,56.8352966,15.8382998,56.6477966,15.6507998z
-                M40.0833969,2.2592001L53.966095,16.1436996H40.0470009C40.1329994,7.1437001,40.1370964,4.0240002,40.0833969,2.2592001z
-                M55,60.8806992c0,0.2569008-0.1637039,0.6520004-0.344902,0.8337021
-                c-0.1840973,0.1840973-0.4883995,0.4292984-0.7492027,0.4292984H10.3219004c-0.3022003,0-0.6817007-0.2613983-0.8951006-0.4742012
-                C9.2130003,61.455101,9,61.0271988,9,60.7249985V2.8494999c0-0.5463998,0.5396004-0.9912,1.0860004-0.9912L38.0429993,1.8565
-                c0.0487976,2.5219998,0.0214996,10.0921001-0.0305023,14.9891005c-0.0029984,0.2670994,0.112999,0.6681004,0.3008995,0.8575001
-                c0.1879997,0.1900005,0.4557991,0.4405994,0.7229004,0.4405994H55V60.8806992z"/>
-            </g>
-          </svg>
-          {{ item.name }}
+          <div class="win7">
+            <button @click="setAddress"><svg width="18px" height="18px" fill="#146ff2" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m12.007 2c-5.518 0-9.998 4.48-9.998 9.998 0 5.517 4.48 9.997 9.998 9.997s9.998-4.48 9.998-9.997c0-5.518-4.48-9.998-9.998-9.998zm1.523 6.21s1.502 1.505 3.255 3.259c.147.147.22.339.22.531s-.073.383-.22.53c-1.753 1.754-3.254 3.258-3.254 3.258-.145.145-.335.217-.526.217-.192-.001-.384-.074-.531-.221-.292-.293-.294-.766-.003-1.057l1.977-1.977h-6.693c-.414 0-.75-.336-.75-.75s.336-.75.75-.75h6.693l-1.978-1.979c-.29-.289-.287-.762.006-1.054.147-.147.339-.221.53-.222.19 0 .38.071.524.215z" fill-rule="nonzero"/></svg></button>
+          </div>
         </div>
-          
-        <div class="dir" v-if="item.type === 'dir'" @click="setPath(item.path)">
-          <svg fill="#000000" height="25px" width="25px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve">
-            <g id="Folder">
-              <path d="M58.7167511,13.9989996H31.10355v-2.6317997c0-1.9678001-0.7656994-3.8183999-2.1543007-5.21
-                c-1.3886986-1.3915997-3.2353992-2.1581998-5.2011986-2.1581998H4.8378501c-2.6679001,0-4.8388,2.1738-4.8388,4.8456998v45.8623009
-                c0,2.9189987,2.3711002,5.2939987,5.2851,5.2939987h53.4326019c2.9141006,0,5.2842026-2.375,5.2842026-5.2939987V19.4375
-                C64.0009537,16.4892998,61.5810509,13.9989996,58.7167511,13.9989996z M4.8378501,6.0009999h18.9102001
-                c1.4296989,0,2.7733994,0.5576,3.7841988,1.5703001c1.0116997,1.0137,1.5692997,2.3623004,1.5692997,3.7958999v2.6353998
-                L2.0009501,14.0818005V8.8446999C2.0009501,7.2764001,3.2734499,6.0009999,4.8378501,6.0009999z M61.9990501,54.7070007
-                c0,1.8154984-1.472702,3.2919998-3.282299,3.2919998H5.2841501c-1.8105001,0-3.2832-1.4765015-3.2832-3.2919998V16.0818005
-                L30.0029507,16c0.0165997-0.0001001,0.0304985-0.0087996,0.046999-0.0095997
-                c0.018301,0.0009995,0.0339012,0.0105991,0.0526009,0.0105991h28.6142006c1.7793007,0,3.282299,1.5741997,3.282299,3.4365005
-                V54.7070007z"/>
-              <path d="M29.9999504,48.9931984h-20c-0.5556002,0-1.0068007,0.4511032-1.0068007,1.0068016
-                s0.4512005,1.0068016,1.0068007,1.0068016h20c0.5557003,0,1.0068989-0.4511032,1.0068989-1.0068016
-                S30.5556507,48.9931984,29.9999504,48.9931984z"/>
-              <path d="M29.9999504,40.9931984h-20c-0.5556002,0-1.0068007,0.4511032-1.0068007,1.0068016
-                s0.4512005,1.0068016,1.0068007,1.0068016h20c0.5557003,0,1.0068989-0.4511032,1.0068989-1.0068016
-                S30.5556507,40.9931984,29.9999504,40.9931984z"/>
-            </g>
-          </svg>
-          {{ item.name }}
+
+      </div>
+
+      <div class="address-bar field-row">
+        <input type="text" disabled :value="address" style="width: 400px">
+
+        <button @click="toUp">
+          <img src="./assets/up.png" alt="Up" style="width: 20px; height: 20px;">
+        </button>
+      </div>
+
+      <div class="loading-container">
+        <div v-show="loading" class="loading marquee" role="progressbar"></div>
+      </div>
+
+      <div class="tabs">
+        <div role="tabpanel">
+          <ul class="files">
+            <li v-for="item in list">
+              
+              <div class="file" v-if="item.type === 'file'" @click="openFile(item.download_url)" :title="item.name">
+                <img src="./assets/file.png" :alt="item.name">
+                <div class="file-name">
+                  {{ item.name }}
+                </div>
+              </div>
+                
+              <div class="dir" v-if="item.type === 'dir'" @click="setPath(item.path)" :title="item.name">
+                <img src="./assets/folder.png" :alt="item.name">
+                <div class="file-name">
+                  {{ item.name }}
+                </div>
+              </div>
+            </li>
+          </ul>
         </div>
-      </li>
-    </ul>
+      </div>
+    </div>
   </div>
+
+
+  <div v-if="error" class="window alert" :class="{ active: error }" style="max-width: 300px; position: fixed; left: calc(50vw - 150px); top: 50vh;">
+    <div class="title-bar">
+      <div class="title-bar-text">Hata</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize"></button>
+        <button aria-label="Maximize"></button>
+        <button aria-label="Close" @click="closeAlert"></button>
+      </div>
+    </div>
+    <div class="window-body has-space">
+      <p>
+        Bağlantı hatası
+      </p>
+      <section class="field-row" style="justify-content: flex-end">
+        <button class="default" @click="closeAlert">Tamam</button>
+        <button @click="closeAlert">İptal</button>
+      </section>
+    </div>
+  </div>
+
 
 </template>
 
 <style scoped>
-  .panel {
-    padding: 30px;
-  }
   .files {
     list-style: none;
     margin: 0;
@@ -126,10 +175,13 @@ function openFile(url) {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
+    min-height: 100px;
+    max-height: 300px;
+    overflow: auto;
   }
 
   .files > li {
-    margin: 20px;
+    margin: 10px 20px;
   }
 
   .files > li > div {
@@ -140,9 +192,17 @@ function openFile(url) {
     align-items: center;
   }
 
-  .files svg {
-    fill: #fff;
-    margin-bottom: 8px;
+  .files .file-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 75px;
+    text-align: center;
+  }
+  
+  .files img {
+    width: 25px;
+    height: 25px;
   }
 
   .dir, .file {
@@ -150,10 +210,19 @@ function openFile(url) {
   }
 
   .address-bar {
-    margin: 0 30px;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 10px;
+    margin: 10px 0 5px 0;
     height: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .loading-container {
+    height: 20px;
+    padding: 4px 0 6px 0;
+  }
+
+  .panel > div {
+    display: flex;
+    justify-content: center;
   }
 </style>
