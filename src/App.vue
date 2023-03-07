@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import Files from './components/Files.vue';
 import Alert from './components/Alert.vue';
+import Preview from './components/Preview.vue';
 
 const repoBox = ref(null);
 const pathBox = ref(null);
@@ -9,10 +10,12 @@ const pathBox = ref(null);
 const loading = ref(false);
 
 const error = ref(false);
+const preview = ref(false);
 
 const repo = ref('yinkar/ilkkanmatik');
 const path = ref('');
 const address = ref('');
+const content = ref('');
 
 const visibleAddress = computed(() => {
   const repoNameArray = repo.value.split('/');
@@ -124,7 +127,22 @@ function setPath(itemPath) {
 }
 
 function openFile(url) {
-   window.open(url, 'file', 'width=400,height=300');
+  fetch(url)
+    .then(r => r.text())
+    .then(d => {
+      preview.value = true;
+
+      if ([ 'png', 'jpg', 'jpeg', 'gif', 'svg', 'jfif', 'webp' ].includes(url.split('.').filter(e => e).at(-1))) {
+        content.value = `
+          <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+            <img src="${url}">  
+          </div>
+        `;
+        return;
+      }
+
+      content.value = `<pre style="font-family: monospace;">${d}</pre>`;
+    });
 }
 
 function toUp() {
@@ -165,6 +183,11 @@ onMounted(() => {
 
   goAddress();
 });
+
+function closePreview() {
+  preview.value = false;
+  content.value = '';
+}
 </script>
 
 <template>
@@ -172,9 +195,9 @@ onMounted(() => {
     <div class="title-bar">
       <div class="title-bar-text">{{ `${repo}/${path}`.split('/').filter(e => e).at(-1) }} - Github Explorer</div>
       <div class="title-bar-controls">
-        <button aria-label="Minimize"></button>
-        <button aria-label="Maximize"></button>
-        <button aria-label="Close"></button>
+        <button aria-label="Minimize" disabled></button>
+        <button aria-label="Maximize" disabled></button>
+        <button aria-label="Close" disabled></button>
       </div>
     </div>
     <div class="window-body has-space" style="min-height: 200px;">
@@ -219,8 +242,9 @@ onMounted(() => {
     </div>
   </div>
 
+  <Preview v-if="preview" :preview="preview" :close-preview="closePreview" :content="content" />
 
-  <Alert v-if="error" :error="error" :close-alert="closeAlert"/>
+  <Alert v-if="error" :error="error" :close-alert="closeAlert" />
 
 </template>
 

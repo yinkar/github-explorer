@@ -10,8 +10,8 @@ defineProps({
     <div class="title-bar">
       <div class="title-bar-text">Hata</div>
       <div class="title-bar-controls">
-        <button aria-label="Minimize"></button>
-        <button aria-label="Maximize"></button>
+        <button aria-label="Minimize" disabled></button>
+        <button aria-label="Maximize" disabled></button>
         <button aria-label="Close" @click="closeAlert"></button>
       </div>
     </div>
