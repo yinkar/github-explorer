@@ -1,0 +1,87 @@
+<script setup>
+defineProps({
+  list: Array,
+  openRepo: Function,
+  openFile: Function,
+  setPath: Function,
+});
+</script>
+
+<template>
+  <ul class="files">
+    <li v-for="item in list">
+      
+      <div class="repo" v-if="item.type === 'repo'" @click="openRepo(item.path)" :title="item.name">
+        <img src="../assets/repo.png" :alt="item.name">
+        <div class="file-name">
+            {{ item.name }}
+        </div>
+      </div>
+
+      <div class="file" v-if="item.type === 'file'" @click="openFile(item.download_url)" :title="item.name">
+        <img src="../assets/file.png" :alt="item.name">
+        <div class="file-name">
+            {{ item.name }}
+        </div>
+      </div>
+      
+      <div class="dir" v-if="item.type === 'dir'" @click="setPath(item.path)" :title="item.name">
+        <img src="../assets/folder.png" :alt="item.name">
+        <div class="file-name">
+            {{ item.name }}
+        </div>
+      </div>
+    </li>
+  </ul>
+</template>
+
+<style scoped>
+.files {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  overflow: auto;
+  width: 500px;
+  height: 250px;
+  align-content: flex-start;
+  max-width: 500px;
+}
+
+.files > li {
+  margin: 20px 20px;
+}
+
+.files > li > div {
+  flex-direction: column;
+  display: flex;
+  font-size: .8rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.files .file-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 75px;
+  text-align: center;
+}
+
+.files img {
+  width: 25px;
+  height: 25px;
+}
+
+.dir, .file, .repo {
+  cursor: pointer;
+}
+
+@media screen and (max-width: 500px) {
+  .files {
+    width: auto;
+  }
+}
+</style>
