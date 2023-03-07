@@ -170,7 +170,7 @@ onMounted(() => {
 <template>
   <div class="main-window window active glass">
     <div class="title-bar">
-      <div class="title-bar-text">Github Explorer</div>
+      <div class="title-bar-text">{{ `${repo}/${path}`.split('/').filter(e => e).at(-1) }} - Github Explorer</div>
       <div class="title-bar-controls">
         <button aria-label="Minimize"></button>
         <button aria-label="Maximize"></button>
