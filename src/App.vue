@@ -40,10 +40,16 @@ function goAddress() {
   repo.value = repoBox.value.value;
   path.value = pathBox.value.value;
 
-  address.value = `${repo.value}/contents/${path.value}`;
-  window.location.hash = `${repo.value}/${path.value}`.replace(/\/$/, '');
-  
   const repoNameArray = repo.value.split('/');
+
+  if (repoNameArray.length > 0) {
+    address.value = `${repo.value}/contents/${path.value}`;
+  }
+  else {
+    address.value = `${repo.value}`;
+  }
+
+  window.location.hash = `${repo.value}/${path.value}`.replace(/\/$/, '');
 
   const getCached = () => {
     const cachedData = window.sessionStorage.getItem(address.value);

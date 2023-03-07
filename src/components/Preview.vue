@@ -28,7 +28,7 @@ defineProps({
   height: 400px;
   position: fixed;
   left: calc(50vw - 250px);
-  top: calc(50vw - 550px);
+  top: calc(50vh - 200px);
 }
 
 iframe {
