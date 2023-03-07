@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'; 
+import { ref, onMounted, computed } from 'vue'; 
 
 const repoBox = ref(null);
 const pathBox = ref(null);
@@ -11,6 +11,15 @@ const error = ref(false);
 const repo = ref('yinkar/ilkkanmatik');
 const path = ref('');
 const address = ref('');
+
+const visibleAddress = computed(() => {
+  const repoNameArray = repo.value.split('/');
+
+  if (repoNameArray.length < 2) return `[${repo.value}]`;
+  if (path.value === '') return `[${repo.value}]/`;
+  
+  return `[${repo.value}] > ${path.value.replaceAll('/', ' > ')}`;
+});
 
 const list = ref([]);
 
@@ -25,8 +34,42 @@ function setAddress() {
   path.value = pathBox.value.value;
 
   address.value = `${repo.value}/contents/${path.value}`;
+  
+  const repoNameArray = repo.value.split('/');
 
-  loading.value = true;
+  if (repoNameArray.length === 0) return;
+
+  // Get repos on user
+  else if (repoNameArray.length === 1) {
+    const username = repoNameArray.at(0);
+
+    loading.value = true;
+    (async () => {
+      try {
+        const response = await fetch(`https://api.github.com/users/${username}/repos`);
+        const data = await response.json();
+
+        list.value.splice(0);
+        list.value.push(...data.map(e => {
+          return {
+            name: e.name,
+            path: e.full_name,
+            type: 'repo',
+          };
+        }).sort((a, b) => {
+          return (b.type > a.type) ? -1 : (a.type > b.type) ? 1 : 0;
+        }));
+
+        loading.value = false;
+      }
+      catch(e) {
+        error.value = true;
+      }
+    })();
+
+    return;
+  }
+
   (async () => {
     try {
       const response = await fetch(`https://api.github.com/repos/${address.value}`);
@@ -45,6 +88,11 @@ function setAddress() {
   })();
 }
 
+function openRepo(repoPath) {
+  repoBox.value.value = repoPath;
+  setAddress();
+}
+
 function setPath(itemPath) {
   pathBox.value.value = itemPath;
   setAddress();
@@ -57,7 +105,15 @@ function openFile(url) {
 function toUp() {
   const pathArray = path.value.split('/');
 
-  if (pathArray.length === 0) return;
+  if (pathArray.length === 1 && pathArray.at(0) === '') {
+    const repoNameArray = repo.value.split('/');
+    if (repoNameArray.length <= 1) return;
+
+    repoBox.value.value = repoNameArray.at(0);
+    setAddress();
+    
+    return;
+  }
 
   pathArray.splice(-1);
 
@@ -107,7 +163,7 @@ onMounted(() => {
       </div>
 
       <div class="address-bar field-row">
-        <input type="text" disabled :value="address" style="width: 400px">
+        <input type="text" disabled :value="visibleAddress" style="width: 400px">
 
         <button @click="toUp">
           <img src="./assets/up.png" alt="Up" style="width: 20px; height: 20px;">
@@ -123,6 +179,13 @@ onMounted(() => {
           <ul class="files">
             <li v-for="item in list">
               
+              <div class="repo" v-if="item.type === 'repo'" @click="openRepo(item.path)" :title="item.name">
+                <img src="./assets/repo.png" :alt="item.name">
+                <div class="file-name">
+                  {{ item.name }}
+                </div>
+              </div>
+
               <div class="file" v-if="item.type === 'file'" @click="openFile(item.download_url)" :title="item.name">
                 <img src="./assets/file.png" :alt="item.name">
                 <div class="file-name">
@@ -205,7 +268,7 @@ onMounted(() => {
     height: 25px;
   }
 
-  .dir, .file {
+  .dir, .file, .repo {
     cursor: pointer;
   }
 
