@@ -22,7 +22,7 @@ const visibleAddress = computed(() => {
 
   if (repoNameArray.length < 2) return `[${repo.value}]`;
   if (path.value === '') return `[${repo.value}]`;
-  
+
   return `[${repo.value}] > ${path.value.replaceAll('/', ' > ')}`;
 });
 
@@ -40,9 +40,9 @@ function goAddress() {
   repo.value = repoBox.value.value;
   path.value = pathBox.value.value;
 
-  const repoNameArray = repo.value.split('/');
+  const repoNameArray = repo.value.split('/').filter(e => e);
 
-  if (repoNameArray.length > 0) {
+  if (repoNameArray.length > 1) {
     address.value = `${repo.value}/contents/${path.value}`;
   }
   else {
@@ -61,16 +61,14 @@ function goAddress() {
       loading.value = false;
       return true;
     }
-    
+
     return false;
   };
 
-  if (repoNameArray.length === 0) return;
-
   // Get repos on user
-  else if (repoNameArray.length === 1) {
+  if (repoNameArray.length === 0) {
     const username = repoNameArray.at(0);
-    
+
     (async () => {
       if (getCached()) return;
 
@@ -93,33 +91,35 @@ function goAddress() {
 
         loading.value = false;
       }
-      catch(e) {
+      catch (e) {
         error.value = true;
       }
     })();
   }
 
-  (async () => {
-    if (getCached()) return;
-    
-    try {
-      const response = await fetch(`https://api.github.com/repos/${address.value}`);
-      const data = await response.json();
+  // Get files of repo
+  else {
+    (async () => {
+      if (getCached()) return;
 
-      list.value.splice(0);
-      list.value.push(...data.sort((a, b) => {
-        return (b.type > a.type) ? -1 : (a.type > b.type) ? 1 : 0;
-      }));
+      try {
+        const response = await fetch(`https://api.github.com/repos/${address.value}`);
+        const data = await response.json();
 
-      window.sessionStorage.setItem(address.value, JSON.stringify(list.value));
+        list.value.splice(0);
+        list.value.push(...data.sort((a, b) => {
+          return (b.type > a.type) ? -1 : (a.type > b.type) ? 1 : 0;
+        }));
 
-      loading.value = false;
-    }
-    catch(e) {
-      error.value = true;
-    }
-  })();
+        window.sessionStorage.setItem(address.value, JSON.stringify(list.value));
 
+        loading.value = false;
+      }
+      catch (e) {
+        error.value = true;
+      }
+    })();
+  }
 }
 
 function openRepo(repoPath) {
@@ -138,7 +138,7 @@ function openFile(url) {
     .then(d => {
       preview.value = true;
 
-      if ([ 'png', 'jpg', 'jpeg', 'gif', 'svg', 'jfif', 'webp' ].includes(url.split('.').filter(e => e).at(-1))) {
+      if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'jfif', 'webp'].includes(url.split('.').filter(e => e).at(-1))) {
         content.value = `
           <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
             <img src="${url}">  
@@ -157,7 +157,7 @@ function toUp() {
   if (pathArray.length === 1 && pathArray.at(0) === '') {
     const repoNameArray = repo.value.split('/');
 
-    if (repoNameArray.length <= 1) {    
+    if (repoNameArray.length <= 1) {
       goAddress();
       return;
     };
@@ -211,7 +211,8 @@ function closePreview() {
         <div class="field-row">
           <div class="input-group">
             <label for="repo">Repo: </label>
-            <input type="text" ref="repoBox" @input="pathBox.value = ''" @keypress="setRepoAndPath" v-model="repo" id="repo" required> 
+            <input type="text" ref="repoBox" @input="pathBox.value = ''" @keypress="setRepoAndPath" v-model="repo"
+              id="repo" required>
           </div>
 
           <div class="input-group">
@@ -221,7 +222,12 @@ function closePreview() {
 
           <div class="win7">
             <button @click="goAddress" :disabled="loading" class="go-button">
-              <svg width="18px" height="18px" fill="#146ff2" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m12.007 2c-5.518 0-9.998 4.48-9.998 9.998 0 5.517 4.48 9.997 9.998 9.997s9.998-4.48 9.998-9.997c0-5.518-4.48-9.998-9.998-9.998zm1.523 6.21s1.502 1.505 3.255 3.259c.147.147.22.339.22.531s-.073.383-.22.53c-1.753 1.754-3.254 3.258-3.254 3.258-.145.145-.335.217-.526.217-.192-.001-.384-.074-.531-.221-.292-.293-.294-.766-.003-1.057l1.977-1.977h-6.693c-.414 0-.75-.336-.75-.75s.336-.75.75-.75h6.693l-1.978-1.979c-.29-.289-.287-.762.006-1.054.147-.147.339-.221.53-.222.19 0 .38.071.524.215z" fill-rule="nonzero"/></svg>
+              <svg width="18px" height="18px" fill="#146ff2" clip-rule="evenodd" fill-rule="evenodd"
+                stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="m12.007 2c-5.518 0-9.998 4.48-9.998 9.998 0 5.517 4.48 9.997 9.998 9.997s9.998-4.48 9.998-9.997c0-5.518-4.48-9.998-9.998-9.998zm1.523 6.21s1.502 1.505 3.255 3.259c.147.147.22.339.22.531s-.073.383-.22.53c-1.753 1.754-3.254 3.258-3.254 3.258-.145.145-.335.217-.526.217-.192-.001-.384-.074-.531-.221-.292-.293-.294-.766-.003-1.057l1.977-1.977h-6.693c-.414 0-.75-.336-.75-.75s.336-.75.75-.75h6.693l-1.978-1.979c-.29-.289-.287-.762.006-1.054.147-.147.339-.221.53-.222.19 0 .38.071.524.215z"
+                  fill-rule="nonzero" />
+              </svg>
             </button>
           </div>
         </div>
@@ -251,7 +257,6 @@ function closePreview() {
   <Preview v-if="preview" :preview="preview" :close-preview="closePreview" :content="content" />
 
   <Alert v-if="error" :error="error" :close-alert="closeAlert" />
-
 </template>
 
 <style scoped>
@@ -272,7 +277,7 @@ function closePreview() {
   padding: 4px 0 6px 0;
 }
 
-.panel > div {
+.panel>div {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -292,7 +297,8 @@ function closePreview() {
     width: 75px;
   }
 
-  .panel button, .address-bar button {
+  .panel button,
+  .address-bar button {
     margin: 6px 0;
   }
 
@@ -316,5 +322,4 @@ function closePreview() {
   .files {
     height: calc(100vh - 190px);
   }
-}
-</style>
+}</style>
