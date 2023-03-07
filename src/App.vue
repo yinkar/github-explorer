@@ -182,12 +182,12 @@ onMounted(() => {
         <div class="field-row">
           <div class="input-group">
             <label for="repo">Repo: </label>
-            <input type="text" ref="repoBox" @keypress="setRepoAndPath" v-model="repo" id="repo" style="width: 120px;" required> 
+            <input type="text" ref="repoBox" @keypress="setRepoAndPath" v-model="repo" id="repo" required> 
           </div>
 
           <div class="input-group">
             <label for="path">Path: </label>
-            <input type="text" ref="pathBox" @keypress="setRepoAndPath" v-model="path" id="path" style="width: 120px;" required>
+            <input type="text" ref="pathBox" @keypress="setRepoAndPath" v-model="path" id="path" required>
           </div>
 
           <div class="win7">
@@ -249,9 +249,21 @@ onMounted(() => {
   align-items: bottom;
 }
 
+.panel input {
+  width: 120px;
+}
+
 @media screen and (max-width: 600px) {
   .main-window {
     width: 100vw;
+  }
+
+  .panel input {
+    width: 75px;
+  }
+
+  .address-bar input {
+    width: 222px;
   }
 }
 </style>
