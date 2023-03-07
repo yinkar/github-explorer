@@ -141,7 +141,7 @@ function openFile(url) {
         return;
       }
 
-      content.value = `<pre style="font-family: monospace;">${d}</pre>`;
+      content.value = `<pre style="font-family: monospace;">${d.replace(/[\u00A0-\u9999<>\&]/gim, e => `&#${e.charCodeAt(0)};`)}</pre>`;
     });
 }
 
