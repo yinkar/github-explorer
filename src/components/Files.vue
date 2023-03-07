@@ -51,7 +51,7 @@ defineProps({
 }
 
 .files > li {
-  margin: 20px 20px;
+  margin: 20px 12px;
 }
 
 .files > li > div {
