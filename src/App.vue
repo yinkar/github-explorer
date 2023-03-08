@@ -21,8 +21,8 @@ const address = ref('');
 const content = ref('');
 
 const moveActive = ref(false);
-const positionX = ref(window.innerWidth / 2);
-const positionY = ref(window.innerHeight / 2);
+const positionX = ref(0);
+const positionY = ref(0);
 const titleClickedX = ref(0);
 const titleClickedY = ref(0);
 
@@ -149,7 +149,9 @@ function openFile(url) {
     .then(d => {
       preview.value = true;
 
-      if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'jfif', 'webp'].includes(url.split('.').filter(e => e).at(-1))) {
+      const fileExtension = url.split('.').filter(e => e).at(-1);
+
+      if ([ 'png', 'jpg', 'jpeg', 'gif', 'svg', 'jfif', 'webp' ].includes(fileExtension)) {
         content.value = `
           <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
             <img src="${url}">  
@@ -157,6 +159,17 @@ function openFile(url) {
         `;
         return;
       }
+      else if ([ 'mp3', 'wav', 'ogg' ].includes(fileExtension)) {
+        content.value = `
+          <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+            <audio controls autoplay>
+              <source src="${url}">  
+            </audio>  
+          </div>
+        `;
+        return;
+      }
+      
 
       content.value = `<pre style="font-family: monospace;">${d.replace(/[\u00A0-\u9999<>\&]/gim, e => `&#${e.charCodeAt(0)};`)}</pre>`;
     });
@@ -205,8 +218,10 @@ onMounted(() => {
   positionX.value = boundingRect.x;
   positionY.value = boundingRect.y;
 
-  positionX.value = window.innerWidth / 2 - boundingRect.width / 2;
-  positionY.value = window.innerHeight / 2 - boundingRect.height / 2;
+  if (window.innerWidth > 900) {
+    positionX.value = window.innerWidth / 2 - boundingRect.width / 2;
+    positionY.value = window.innerHeight / 2 - boundingRect.height / 2;
+  }
 
   window.addEventListener('mousemove', e => {
     if (moveActive.value) {
@@ -362,8 +377,5 @@ function titleMouseDown(e) {
   .tabs {
     height: calc(100vh - 160px);
   }
-
-  .files {
-    height: calc(100vh - 190px);
-  }
-}</style>
+}
+</style>

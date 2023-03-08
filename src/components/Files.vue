@@ -81,6 +81,7 @@ defineProps({
 @media screen and (max-width: 900px) {
   .files {
     width: auto;
+    height: calc(100vh - 190px);
   }
 }
 </style>
