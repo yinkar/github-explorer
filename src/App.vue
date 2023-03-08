@@ -65,8 +65,10 @@ function goAddress() {
     return false;
   };
 
+  if (repoNameArray.length === 0) return;
+
   // Get repos on user
-  if (repoNameArray.length === 0) {
+  else if (repoNameArray.length === 1) {
     const username = repoNameArray.at(0);
 
     (async () => {
