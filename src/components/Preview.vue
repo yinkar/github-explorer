@@ -21,11 +21,10 @@ onMounted(() => {
   const boundingRect = previewPopup.value.getBoundingClientRect();
 
   positionX.value = boundingRect.x;
-  positionY.value = boundingRect.y;
+  positionY.value = window.innerHeight / 2 - boundingRect.height / 2;
 
   if (window.innerWidth > 900) {
     positionX.value = window.innerWidth / 2 - boundingRect.width / 2;
-    positionY.value = window.innerHeight / 2 - boundingRect.height / 2;
   }
 });
 </script>
@@ -72,10 +71,6 @@ iframe {
 @media screen and (max-width: 900px) {
   .preview-popup {
     width: 100%;
-    height: 100%;
-    position: fixed;
-    left: 0;
-    top: 0;
   }
 }
 </style>
