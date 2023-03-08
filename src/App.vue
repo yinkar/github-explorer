@@ -4,6 +4,8 @@ import Files from './components/Files.vue';
 import Alert from './components/Alert.vue';
 import Preview from './components/Preview.vue';
 
+import { drag } from './draggable';
+
 const main = ref(null);
 const titleBar = ref(null);
 
@@ -19,12 +21,13 @@ const repo = ref('yinkar/ilkkanmatik');
 const path = ref('');
 const address = ref('');
 const content = ref('');
+const previewTitle = ref('');
 
-const moveActive = ref(false);
-const positionX = ref(0);
-const positionY = ref(0);
-const titleClickedX = ref(0);
-const titleClickedY = ref(0);
+const {
+  positionX,
+  positionY,
+  titleMouseDown,
+} = drag();
 
 const visibleAddress = computed(() => {
   const repoNameArray = repo.value.split('/');
@@ -143,7 +146,7 @@ function setPath(itemPath) {
   goAddress();
 }
 
-function openFile(url) {
+function openFile(url, name) {
   fetch(url)
     .then(r => r.text())
     .then(d => {
@@ -151,9 +154,11 @@ function openFile(url) {
 
       const fileExtension = url.split('.').filter(e => e).at(-1);
 
+      previewTitle.value = name;
+
       if ([ 'png', 'jpg', 'jpeg', 'gif', 'svg', 'jfif', 'webp' ].includes(fileExtension)) {
         content.value = `
-          <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+          <div style="width: 100%; height: 100%;">
             <img src="${url}">  
           </div>
         `;
@@ -161,7 +166,7 @@ function openFile(url) {
       }
       else if ([ 'mp3', 'wav', 'ogg' ].includes(fileExtension)) {
         content.value = `
-          <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+          <div style="width: 100%; height: 100%;">
             <audio controls autoplay>
               <source src="${url}">  
             </audio>  
@@ -170,8 +175,7 @@ function openFile(url) {
         return;
       }
       
-
-      content.value = `<pre style="font-family: monospace;">${d.replace(/[\u00A0-\u9999<>\&]/gim, e => `&#${e.charCodeAt(0)};`)}</pre>`;
+      content.value = `<pre style="font-family: monospace; font-size: .63rem">${d.replace(/[\u00A0-\u9999<>\&]/gim, e => `&#${e.charCodeAt(0)};`)}</pre>`;
     });
 }
 
@@ -201,6 +205,12 @@ function closeAlert() {
   loading.value = false;
 }
 
+function closePreview(e) {
+  e.stopImmediatePropagation();
+  preview.value = false;
+  content.value = '';
+}
+
 onMounted(() => {
   if (window.location.hash !== '') {
     const hashArray = window.location.hash.substring(1).split('/');
@@ -222,30 +232,7 @@ onMounted(() => {
     positionX.value = window.innerWidth / 2 - boundingRect.width / 2;
     positionY.value = window.innerHeight / 2 - boundingRect.height / 2;
   }
-
-  window.addEventListener('mousemove', e => {
-    if (moveActive.value) {
-      positionX.value = e.clientX - titleClickedX.value;
-      positionY.value = e.clientY - titleClickedY.value;
-    }
-  });
-
-  window.addEventListener('mouseup', () => {
-    moveActive.value = false;
-  });
 });
-
-function closePreview() {
-  preview.value = false;
-  content.value = '';
-}
-
-function titleMouseDown(e) {
-  moveActive.value = true;
-
-  titleClickedX.value = e.offsetX;
-  titleClickedY.value = e.offsetY;
-}
 
 </script>
 
@@ -274,7 +261,7 @@ function titleMouseDown(e) {
           </div>
 
           <div class="win7">
-            <button @click="goAddress" :disabled="loading" class="go-button">
+            <button @click="goAddress" :disabled="loading" class="default go-button">
               <svg width="18px" height="18px" fill="#146ff2" clip-rule="evenodd" fill-rule="evenodd"
                 stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -287,8 +274,8 @@ function titleMouseDown(e) {
 
       </div>
 
-      <div class="address-bar field-row">
-        <input type="text" :title="visibleAddress" :value="visibleAddress" disabled>
+      <div class="address-bar-container field-row">
+        <div class="address-bar" :title="visibleAddress">{{ visibleAddress }}</div>
 
         <button @click="toUp" :disabled="loading">
           <img src="./assets/up.png" alt="Up" style="width: 20px; height: 20px;">
@@ -307,7 +294,7 @@ function titleMouseDown(e) {
     </div>
   </div>
 
-  <Preview v-if="preview" :preview="preview" :close-preview="closePreview" :content="content" />
+  <Preview v-if="preview" :preview="preview" :close-preview="closePreview" :content="content" :title="previewTitle" />
 
   <Alert v-if="error" :error="error" :close-alert="closeAlert" />
 </template>
@@ -318,7 +305,7 @@ function titleMouseDown(e) {
   width: 500px;
 }
 
-.address-bar {
+.address-bar-container {
   margin: 10px 0 5px 0;
   height: 1rem;
   display: flex;
@@ -326,8 +313,13 @@ function titleMouseDown(e) {
   flex-wrap: wrap;
 }
 
-.address-bar input {
+.address-bar {
   width: 312px;
+  border: 1px solid #eee;
+  background-color: #ddd;
+  color: #666;
+  box-sizing: border-box;
+  padding: 4px 10px;
 }
 
 .loading-container {
@@ -346,6 +338,11 @@ function titleMouseDown(e) {
   width: 120px;
 }
 
+.go-button {
+  padding-top: 2px;
+  box-sizing: border-box;
+}
+
 @media screen and (max-width: 900px) {
   .main-window {
     width: 100vw;
@@ -357,17 +354,18 @@ function titleMouseDown(e) {
   }
 
   .panel button,
-  .address-bar button {
+  .address-bar-container button {
     margin: 6px 0;
   }
 
-  .address-bar {
+  .address-bar-container {
     margin-bottom: 10px;
   }
 
-  .address-bar input {
+  .address-bar {
     width: 210px;
     margin-right: 14px;
+    font-size: .6rem;
   }
 
   .loading-container {
