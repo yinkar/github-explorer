@@ -18,13 +18,8 @@ const {
 onMounted(() => {
   const boundingRect = alertPopup.value.getBoundingClientRect();
 
-  positionX.value = boundingRect.x;
-  positionY.value = boundingRect.y;
-
-  if (window.innerWidth > 900) {
-    positionX.value = window.innerWidth / 2 - boundingRect.width / 2;
-    positionY.value = window.innerHeight / 2 - boundingRect.height / 2;
-  }
+  positionX.value = window.innerWidth / 2 - boundingRect.width / 2;
+  positionY.value = window.innerHeight / 2 - boundingRect.height / 2;
 });
 </script>
 
