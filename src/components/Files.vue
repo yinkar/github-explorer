@@ -19,7 +19,7 @@ defineProps({
       </div>
 
       <div class="file" v-if="item.type === 'file' && [ 'png', 'jpg', 'jpeg', 'gif', 'svg', 'jfif', 'webp' ].includes(item.name.split('.').filter(e => e).at(-1))" @click="openFile(item.download_url, item.name)" :title="item.name">
-        <img :src="item.download_url" :alt="item.name">
+        <img :src="item.download_url" :alt="item.name" style="object-fit: cover;">
         <div class="file-name">
             {{ item.name }}
         </div>
