@@ -4,6 +4,9 @@ import Files from './components/Files.vue';
 import Alert from './components/Alert.vue';
 import Preview from './components/Preview.vue';
 
+const main = ref(null);
+const titleBar = ref(null);
+
 const repoBox = ref(null);
 const pathBox = ref(null);
 
@@ -16,6 +19,12 @@ const repo = ref('yinkar/ilkkanmatik');
 const path = ref('');
 const address = ref('');
 const content = ref('');
+
+const moveActive = ref(false);
+const positionX = ref(window.innerWidth / 2);
+const positionY = ref(window.innerHeight / 2);
+const titleClickedX = ref(0);
+const titleClickedY = ref(0);
 
 const visibleAddress = computed(() => {
   const repoNameArray = repo.value.split('/');
@@ -190,17 +199,44 @@ onMounted(() => {
   }
 
   goAddress();
+
+  const boundingRect = main.value.getBoundingClientRect();
+
+  positionX.value = boundingRect.x;
+  positionY.value = boundingRect.y;
+
+  positionX.value = window.innerWidth / 2 - boundingRect.width / 2;
+  positionY.value = window.innerHeight / 2 - boundingRect.height / 2;
+
+  window.addEventListener('mousemove', e => {
+    if (moveActive.value) {
+      positionX.value = e.clientX - titleClickedX.value;
+      positionY.value = e.clientY - titleClickedY.value;
+    }
+  });
+
+  window.addEventListener('mouseup', () => {
+    moveActive.value = false;
+  });
 });
 
 function closePreview() {
   preview.value = false;
   content.value = '';
 }
+
+function titleMouseDown(e) {
+  moveActive.value = true;
+
+  titleClickedX.value = e.offsetX;
+  titleClickedY.value = e.offsetY;
+}
+
 </script>
 
 <template>
-  <div class="main-window window active glass">
-    <div class="title-bar">
+  <div class="main-window window active glass" ref="main" :style="{ left: `${positionX}px`, top: `${positionY}px` }">
+    <div class="title-bar" @mousedown="titleMouseDown" ref="titleBar">
       <div class="title-bar-text">{{ `${repo}/${path}`.split('/').filter(e => e).at(-1) }} - Github Explorer</div>
       <div class="title-bar-controls">
         <button aria-label="Minimize" disabled></button>
@@ -262,6 +298,11 @@ function closePreview() {
 </template>
 
 <style scoped>
+.main-window {
+  position: absolute;
+  width: 500px;
+}
+
 .address-bar {
   margin: 10px 0 5px 0;
   height: 1rem;
@@ -293,6 +334,7 @@ function closePreview() {
 @media screen and (max-width: 900px) {
   .main-window {
     width: 100vw;
+    background-size: inherit;
   }
 
   .panel input {

@@ -3,17 +3,16 @@ body {
   padding: 0;
   margin: 0;
   font-family: sans-serif;
+  overflow: hidden;
 }
 
 body {
   background-color: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   height: 100vh;
   background-image: url('/wallpaper.jpg');
   background-size: cover;
   background-position: center center;
+  position: relative;
 }
 
 button {
@@ -22,8 +21,13 @@ button {
 }
 
 @media screen and (max-width: 600px) {
-  .main-window {
-    width: 100vw;
-    background-size: inherit;
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+}
+
+.title-bar {
+  user-select: none;
 }

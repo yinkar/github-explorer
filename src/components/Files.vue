@@ -44,7 +44,7 @@ defineProps({
   flex-wrap: wrap;
   justify-content: flex-start;
   overflow: auto;
-  width: 500px;
+  width: 100%;
   height: 250px;
   align-content: flex-start;
 }
