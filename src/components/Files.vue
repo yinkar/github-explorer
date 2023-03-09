@@ -1,33 +1,14 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-
 defineProps({
   list: Array,
   openRepo: Function,
   openFile: Function,
   setPath: Function,
 });
-
-const files = ref(null);
-
-onMounted(() => {
-  const fitToScreen = (mediaQuery) => {
-    if (mediaQuery.matches) {
-      files.value.style.height = `calc(${window.innerHeight}px - 210px)`;
-    }
-    else {
-      files.value.style.height = `250px`;
-    }
-  };
-
-  const mediaQuery = window.matchMedia('(max-width: 900px)');
-  fitToScreen(mediaQuery);
-  mediaQuery.addEventListener('change', fitToScreen);
-});
 </script>
 
 <template>
-  <ul class="files" ref="files">
+  <ul class="files">
     <li v-for="item in list">
       
       <div class="repo" v-if="item.type === 'repo'" @click="openRepo(item.path)" :title="item.name">
@@ -114,6 +95,7 @@ onMounted(() => {
 @media screen and (max-width: 900px) {
   .files {
     width: auto;
+    height: calc(100vh - 270px);
   }
 }
 </style>
