@@ -8,6 +8,7 @@ import { drag } from './draggable';
 
 const main = ref(null);
 const titleBar = ref(null);
+const tabs = ref(null);
 
 const repoBox = ref(null);
 const pathBox = ref(null);
@@ -232,6 +233,22 @@ onMounted(() => {
     positionX.value = window.innerWidth / 2 - boundingRect.width / 2;
     positionY.value = window.innerHeight / 2 - boundingRect.height / 2;
   }
+
+  const fitToScreen = (mediaQuery) => {
+    if (mediaQuery.matches) {
+      tabs.value.style.height = `calc(${window.innerHeight}px - 180px)`;
+      positionX.value = 0;
+      positionY.value = 0;
+    }
+    else {
+      tabs.value.style.height = `auto`;
+    }
+  };
+
+  const mediaQuery = window.matchMedia('(max-width: 900px)');
+  fitToScreen(mediaQuery);
+  mediaQuery.addEventListener('change', fitToScreen);
+
 });
 
 </script>
@@ -286,7 +303,7 @@ onMounted(() => {
         <div v-show="loading" class="loading marquee" role="progressbar"></div>
       </div>
 
-      <div class="tabs">
+      <div class="tabs" ref="tabs">
         <div role="tabpanel">
           <Files :list="list" :open-repo="openRepo" :open-file="openFile" :set-path="setPath" />
         </div>
@@ -381,10 +398,6 @@ onMounted(() => {
 
   .loading-container {
     margin-top: 20px;
-  }
-
-  .tabs {
-    height: calc(100vh - 180px);
   }
 }
 </style>
