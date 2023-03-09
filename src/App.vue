@@ -292,6 +292,10 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <div class="status-bar">
+      <p class="status-bar-field"><a :href="`https://github.com/${repo}/${path}`" target="_blank">{{ `https://github.com/${repo}/${path}` }}</a></p>
+    </div>
   </div>
 
   <Preview v-if="preview" :preview="preview" :close-preview="closePreview" :content="content" :title="previewTitle" />
@@ -373,7 +377,7 @@ onMounted(() => {
   }
 
   .tabs {
-    height: calc(100vh - 160px);
+    height: calc(100vh - 180px);
   }
 }
 </style>

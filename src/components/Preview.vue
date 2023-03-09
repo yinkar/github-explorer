@@ -15,6 +15,7 @@ const {
   positionX,
   positionY,
   titleMouseDown,
+  moveActive,
 } = drag();
 
 onMounted(() => {
@@ -40,7 +41,7 @@ onMounted(() => {
       </div>
     </div>
     <div class="window-body">
-      <iframe :srcdoc="content" frameborder="0" style="pointer-events: none;"></iframe>
+      <iframe :srcdoc="content" frameborder="0" :style="{ pointerEvents: moveActive ? 'none' : 'all' }"></iframe>
     </div>
   </div>
 </template>
