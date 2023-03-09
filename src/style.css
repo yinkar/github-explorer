@@ -20,14 +20,22 @@ button {
   vertical-align: top;
 }
 
+.title-bar {
+  user-select: none;
+}
+
+.window-body {
+  user-select: none;
+}
+
+.address-bar, input {
+  user-select: text;
+}
+
 @media screen and (max-width: 600px) {
   body {
     display: flex;
     align-items: center;
     justify-content: center;
   }
-}
-
-.title-bar {
-  user-select: none;
-}
+} 
