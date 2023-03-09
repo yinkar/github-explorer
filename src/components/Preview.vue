@@ -33,7 +33,7 @@ onMounted(() => {
 <template>
   <div class="preview-popup window violet glass" ref="previewPopup" :class="{ active: preview }" :style="{ left: `${positionX}px`, top: `${positionY}px` }">
     <div class="title-bar" style="padding: 0">
-      <div class="title-bar-text" style="display: block; width: 100%; padding: 6px;" @mousedown="titleMouseDown">{{ title }} - Önizleme</div>
+      <div class="title-bar-text" style="display: block; width: 100%; padding: 6px;" @mousedown="titleMouseDown">{{ title }} - Preview</div>
       <div class="title-bar-controls" style="margin-right: 6px;">
         <button aria-label="Minimize" disabled></button>
         <button aria-label="Maximize" disabled></button>
