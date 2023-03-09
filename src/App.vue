@@ -17,7 +17,7 @@ const loading = ref(false);
 const error = ref(false);
 const preview = ref(false);
 
-const repo = ref('yinkar/ilkkanmatik');
+const repo = ref('yinkar');
 const path = ref('');
 const address = ref('');
 const content = ref('');
