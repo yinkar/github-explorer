@@ -370,6 +370,13 @@ onMounted(() => {
     width: 210px;
     margin-right: 14px;
     font-size: .6rem;
+    white-space: nowrap;
+    overflow: auto;
+  }
+
+  .address-bar::-webkit-scrollbar {
+    width: 10px;
+    display: none;
   }
 
   .loading-container {
@@ -377,7 +384,7 @@ onMounted(() => {
   }
 
   .tabs {
-    height: calc(100vh - 200px);
+    height: calc(100vh - 180px);
   }
 }
 </style>

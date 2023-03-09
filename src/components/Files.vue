@@ -25,6 +25,13 @@ defineProps({
         </div>
       </div>
 
+      <div class="file" v-else-if="item.type === 'file' && [ 'mp3', 'wav', 'ogg' ].includes(item.name.split('.').filter(e => e).at(-1))" @click="openFile(item.download_url, item.name)" :title="item.name">
+        <img src="../assets/audio-file.png" :alt="item.name">
+        <div class="file-name">
+            {{ item.name }}
+        </div>
+      </div>
+
       <div class="file" v-else-if="item.type === 'file'" @click="openFile(item.download_url, item.name)" :title="item.name">
         <img src="../assets/file.png" :alt="item.name">
         <div class="file-name">
@@ -88,7 +95,7 @@ defineProps({
 @media screen and (max-width: 900px) {
   .files {
     width: auto;
-    height: calc(100vh - 230px);
+    height: calc(100vh - 210px);
   }
 }
 </style>
