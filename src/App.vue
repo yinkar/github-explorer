@@ -69,7 +69,6 @@ function goAddress() {
     const cachedData = window.sessionStorage.getItem(address.value);
 
     if (cachedData) {
-      list.value.splice(0);
       list.value.push(...JSON.parse(cachedData));
 
       loading.value = false;
@@ -85,55 +84,72 @@ function goAddress() {
   else if (repoNameArray.length === 1) {
     const username = repoNameArray.at(0);
 
-    (async () => {
+    (() => {
+      list.value.splice(0);
+
       if (getCached()) return;
 
-      try {
-        const response = await fetch(`https://api.github.com/users/${username}/repos`);
-        const data = await response.json();
+      const getRepos = async (page = 1) => {
+        try {
+          const response = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&page=${page}`);
+          const data = await response.json();
+            
+          if (data.length > 0) {
+            list.value.push(...data.map(e => {
+              return {
+                name: e.name,
+                path: e.full_name,
+                type: 'repo',
+              };
+            }).sort((a, b) => {
+              return (b.type > a.type) ? -1 : (a.type > b.type) ? 1 : 0;
+            }));
 
-        list.value.splice(0);
-        list.value.push(...data.map(e => {
-          return {
-            name: e.name,
-            path: e.full_name,
-            type: 'repo',
+            window.sessionStorage.setItem(address.value, JSON.stringify(list.value));
+
+            loading.value = false;
+
+            getRepos(page + 1);
           };
-        }).sort((a, b) => {
-          return (b.type > a.type) ? -1 : (a.type > b.type) ? 1 : 0;
-        }));
-
-        window.sessionStorage.setItem(address.value, JSON.stringify(list.value));
-
-        loading.value = false;
-      }
-      catch (e) {
-        error.value = true;
-      }
+        }
+        catch (e) {
+          error.value = true;
+        }
+      };
+      
+      getRepos(1);
     })();
   }
 
   // Get files of repo
   else {
-    (async () => {
+    (() => {
+      list.value.splice(0);
+
       if (getCached()) return;
 
-      try {
-        const response = await fetch(`https://api.github.com/repos/${address.value}`);
-        const data = await response.json();
+      const getFiles = async () => {
+        try {
+          const response = await fetch(`https://api.github.com/repos/${address.value}?per_page=100`);
+          const data = await response.json();
 
-        list.value.splice(0);
-        list.value.push(...data.sort((a, b) => {
-          return (b.type > a.type) ? -1 : (a.type > b.type) ? 1 : 0;
-        }));
+          if (data.length > 0) {
+            list.value.splice(0);
+            list.value.push(...data.sort((a, b) => {
+              return (b.type > a.type) ? -1 : (a.type > b.type) ? 1 : 0;
+            }));
 
-        window.sessionStorage.setItem(address.value, JSON.stringify(list.value));
+            window.sessionStorage.setItem(address.value, JSON.stringify(list.value));
 
-        loading.value = false;
-      }
-      catch (e) {
-        error.value = true;
-      }
+            loading.value = false;
+          }
+        }
+        catch (e) {
+          error.value = true;
+        }
+      };
+
+      getFiles(1);
     })();
   }
 }
@@ -217,6 +233,8 @@ function clearCache() {
   cacheClearing.value = true;
 
   window.sessionStorage.clear();
+
+  list.value.splice(0);
 
   setTimeout(() => {
     cacheClearing.value = false;
@@ -311,8 +329,8 @@ onMounted(() => {
         <a :href="`https://github.com/${repo}`" target="_blank">{{ `https://github.com/${repo}` }}</a>
       </p>
       <p class="status-bar-field" style="text-align: center;">
-        <button @click="clearCache" style="min-width: 20px !important; zoom: 0.6; padding: 0; border: none; background: none;" class="clear-cache-button">
-          <img src="./assets/clear-cache.png" alt="Clear Cache" :class="{ cacheClearing }" style="width: 20px; height: 20px;">
+        <button @click="clearCache" style="min-width: 20px !important; zoom: 0.6; padding: 0; border: none; background: none;" class="clear-cache-button" title="Clear cache">
+          <img src="./assets/clear-cache.png" alt="Clear cache" :class="{ cacheClearing }" style="width: 20px; height: 20px;">
         </button>  
       </p>
     </div>
@@ -344,6 +362,12 @@ onMounted(() => {
   color: #666;
   box-sizing: border-box;
   padding: 4px 10px;
+  white-space: nowrap;
+  overflow: auto;
+}
+
+.address-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .loading-container {
