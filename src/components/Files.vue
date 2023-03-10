@@ -3,6 +3,7 @@ defineProps({
   list: Array,
   openRepo: Function,
   openFile: Function,
+  openFileOnNewWindow: Function,
   setPath: Function,
 });
 </script>
@@ -27,6 +28,13 @@ defineProps({
 
       <div class="file" v-else-if="item.type === 'file' && [ 'mp3', 'wav', 'ogg' ].includes(item.name.split('.').filter(e => e).at(-1))" @click="openFile(item.download_url, item.name)" :title="item.name">
         <img src="../assets/audio-file.png" :alt="item.name">
+        <div class="file-name">
+            {{ item.name }}
+        </div>
+      </div>
+
+      <div class="file" v-else-if="item.type === 'file' && [ 'pdf', 'doc', 'xls' ].includes(item.name.split('.').filter(e => e).at(-1))" @click="openFileOnNewWindow(item.download_url, item.name)" :title="item.name">
+        <img src="../assets/file.png" :alt="item.name">
         <div class="file-name">
             {{ item.name }}
         </div>

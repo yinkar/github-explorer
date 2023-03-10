@@ -192,9 +192,16 @@ function openFile(url, name) {
         `;
         return;
       }
+      else if ([ 'pdf', 'doc', 'xls' ].includes(fileExtension)) {
+        return;
+      }
       
       content.value = `<pre style="font-family: monospace; font-size: .63rem">${d.replace(/[\u00A0-\u9999<>\&]/gim, e => `&#${e.charCodeAt(0)};`)}</pre>`;
     });
+}
+
+function openFileOnNewWindow(url, name) {
+   window.open(url, encodeURI(`file-${name}`));
 }
 
 function toUp() {
@@ -319,7 +326,7 @@ onMounted(() => {
 
       <div class="tabs">
         <div role="tabpanel">
-          <Files :list="list" :open-repo="openRepo" :open-file="openFile" :set-path="setPath" />
+          <Files :list="list" :open-repo="openRepo" :open-file="openFile" :open-file-on-new-window="openFileOnNewWindow" :set-path="setPath" />
         </div>
       </div>
     </div>
