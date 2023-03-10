@@ -330,7 +330,7 @@ onMounted(() => {
       </p>
       <p class="status-bar-field" style="text-align: center;">
         <button @click="clearCache" style="min-width: 20px !important; zoom: 0.6; padding: 0; border: none; background: none;" class="clear-cache-button" title="Clear cache">
-          <img src="./assets/clear-cache.png" alt="Clear cache" :class="{ cacheClearing }" style="width: 20px; height: 20px;">
+          <img src="./assets/clear-cache.png" alt="Clear cache" :class="{ 'cache-clearing' :cacheClearing }" style="width: 20px; height: 20px;">
         </button>  
       </p>
     </div>
@@ -391,7 +391,7 @@ onMounted(() => {
   box-sizing: border-box;
 }
 
-.cacheClearing {
+.cache-clearing {
   animation: spinning 1s linear;
 }
 

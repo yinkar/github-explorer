@@ -97,5 +97,9 @@ defineProps({
     width: auto;
     height: calc(100vh - 270px);
   }
+
+  .files > li {
+    margin: 20px 20px;
+  }
 }
 </style>
