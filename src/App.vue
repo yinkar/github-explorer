@@ -92,6 +92,11 @@ function goAddress() {
       const getRepos = async (page = 1) => {
         try {
           const response = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&page=${page}`);
+          if (response.status !== 200) {
+            error.value = true;
+            return;
+          }
+          
           const data = await response.json();
             
           if (data.length > 0) {
@@ -131,6 +136,11 @@ function goAddress() {
       const getFiles = async () => {
         try {
           const response = await fetch(`https://api.github.com/repos/${address.value}`);
+          if (response.status !== 200) {
+            error.value = true;
+            return;
+          }
+
           const data = await response.json();
 
           if (data.length > 0) {
