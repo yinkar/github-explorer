@@ -32,6 +32,20 @@ button {
   user-select: text;
 }
 
+.title-bar {
+  padding: 0;
+}
+
+.title-bar-text {
+  display: block;
+  width: 100%;
+  padding: 6px;
+}
+
+.title-bar-controls {
+  margin-right: 6px;
+}
+
 @media screen and (max-width: 600px) {
   body {
     display: flex;

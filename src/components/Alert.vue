@@ -25,8 +25,8 @@ onMounted(() => {
 
 <template>
   <div class="error-popup window alert" ref="alertPopup" :class="{ active: error }" :style="{ left: `${positionX}px`, top: `${positionY}px` }">
-    <div class="title-bar" @mousedown="titleMouseDown">
-      <div class="title-bar-text">Hata</div>
+    <div class="title-bar">
+      <div class="title-bar-text" @mousedown="titleMouseDown">Hata</div>
       <div class="title-bar-controls">
         <button aria-label="Minimize" disabled></button>
         <button aria-label="Maximize" disabled></button>
