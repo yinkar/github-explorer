@@ -12,6 +12,8 @@ const titleBar = ref(null);
 const repoBox = ref(null);
 const pathBox = ref(null);
 
+const cacheClearing = ref(false);
+
 const loading = ref(false);
 
 const error = ref(false);
@@ -211,6 +213,17 @@ function closePreview(e) {
   content.value = '';
 }
 
+function clearCache() {
+  cacheClearing.value = true;
+
+  window.sessionStorage.clear();
+
+  setTimeout(() => {
+    cacheClearing.value = false;
+    goAddress();
+  }, 1000);
+}
+
 onMounted(() => {
   if (window.location.hash !== '') {
     const hashArray = window.location.hash.substring(1).split('/');
@@ -294,7 +307,14 @@ onMounted(() => {
     </div>
 
     <div class="status-bar">
-      <p class="status-bar-field"><a :href="`https://github.com/${repo}`" target="_blank">{{ `https://github.com/${repo}` }}</a></p>
+      <p class="status-bar-field" style="width: 90%">
+        <a :href="`https://github.com/${repo}`" target="_blank">{{ `https://github.com/${repo}` }}</a>
+      </p>
+      <p class="status-bar-field" style="text-align: center;">
+        <button @click="clearCache" style="min-width: 20px !important; zoom: 0.6; padding: 0; border: none; background: none;" class="clear-cache-button">
+          <img src="./assets/clear-cache.png" alt="Clear Cache" :class="{ cacheClearing }" style="width: 20px; height: 20px;">
+        </button>  
+      </p>
     </div>
   </div>
 
@@ -345,6 +365,19 @@ onMounted(() => {
 .go-button {
   padding-top: 2px;
   box-sizing: border-box;
+}
+
+.cacheClearing {
+  animation: spinning 1s linear;
+}
+
+@keyframes spinning {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @media screen and (max-width: 900px) {
