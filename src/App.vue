@@ -395,6 +395,10 @@ onMounted(() => {
   animation: spinning 1s linear;
 }
 
+[role=tabpanel] {
+  padding: 0;
+}
+
 @keyframes spinning {
   0% {
     transform: rotate(0);
