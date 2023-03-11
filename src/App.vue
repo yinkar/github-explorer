@@ -288,6 +288,13 @@ onMounted(() => {
     positionX.value = window.innerWidth / 2 - boundingRect.width / 2;
     positionY.value = window.innerHeight / 2 - boundingRect.height / 2;
   }
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth < 900) {
+      positionX.value = 0;
+      positionY.value = 0;
+    }
+  });
 });
 
 </script>
