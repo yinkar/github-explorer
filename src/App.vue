@@ -25,6 +25,8 @@ const address = ref('');
 const content = ref('');
 const previewTitle = ref('');
 
+const searchQuery = ref('');
+
 const {
   positionX,
   positionY,
@@ -247,6 +249,7 @@ function closePreview(e) {
 }
 
 function clearCache() {
+  loading.value = true;
   cacheClearing.value = true;
 
   window.sessionStorage.clear();
@@ -255,8 +258,13 @@ function clearCache() {
 
   setTimeout(() => {
     cacheClearing.value = false;
+    loading.value = false;
     goAddress();
   }, 1000);
+}
+
+function search(e) {
+  console.log(searchQuery.value);
 }
 
 onMounted(() => {
@@ -330,13 +338,21 @@ onMounted(() => {
         </button>
       </div>
 
+      <div class="search-bar-container field-row">
+        <div class="input-group">
+          <label for="repo">Search: </label>
+          <input type="text" ref="searchBox" @input="search" v-model="searchQuery"
+            id="search">
+        </div>
+      </div>
+
       <div class="loading-container">
         <div v-show="loading" class="loading marquee" role="progressbar"></div>
       </div>
 
       <div class="tabs">
         <div role="tabpanel">
-          <Files :list="list" :open-repo="openRepo" :open-file="openFile" :open-file-on-new-window="openFileOnNewWindow" :set-path="setPath" />
+          <Files :list="list.filter(e => e.name.replaceAll('-', ' ').toLowerCase().startsWith(searchQuery.toLowerCase()))" :open-repo="openRepo" :open-file="openFile" :open-file-on-new-window="openFileOnNewWindow" :set-path="setPath" />
         </div>
       </div>
     </div>
@@ -364,12 +380,20 @@ onMounted(() => {
   width: 500px;
 }
 
-.address-bar-container {
+.address-bar-container, .search-bar-container {
   margin: 10px 0 5px 0;
   height: 1rem;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+}
+
+.search-bar-container {
+  margin-top: 20px;
+}
+
+.search-bar-container input {
+  width: 350px;
 }
 
 .address-bar {
