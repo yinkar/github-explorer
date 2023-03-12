@@ -182,21 +182,29 @@ function openFile(url, name) {
   fetch(url)
     .then(r => r.text())
     .then(d => {
-      preview.value = true;
-
       const fileExtension = url.split('.').filter(e => e).at(-1);
 
-      previewTitle.value = name;
+      const setPreview = () => {
+        preview.value = true;
+        previewTitle.value = name;
+      };
+
+      const newTab = () => {    
+       window.open(url, encodeURI(`file-${name}`));
+      }
 
       if ([ 'png', 'jpg', 'jpeg', 'gif', 'svg', 'jfif', 'webp' ].includes(fileExtension)) {
+        setPreview();
+
         content.value = `
           <div style="width: 100%; height: 100%;">
             <img src="${url}">  
           </div>
         `;
-        return;
       }
       else if ([ 'mp3', 'wav', 'ogg' ].includes(fileExtension)) {
+        setPreview();
+
         content.value = `
           <div style="width: 100%; height: 100%;">
             <audio controls autoplay>
@@ -204,21 +212,19 @@ function openFile(url, name) {
             </audio>  
           </div>
         `;
-        return;
       }
       else if ([ 'pdf', 'doc', 'xls' ].includes(fileExtension)) {
-        return;
+        newTab();
       }
       else if ([ 'ttf' ].includes(fileExtension)) {
-        return;
+        newTab();
       }
-      
-      content.value = `<pre style="font-family: monospace; font-size: .63rem">${d.replace(/[\u00A0-\u9999<>\&]/gim, e => `&#${e.charCodeAt(0)};`)}</pre>`;
-    });
-}
+      else {
+        setPreview();
 
-function openFileOnNewWindow(url, name) {
-   window.open(url, encodeURI(`file-${name}`));
+        content.value = `<pre style="font-family: monospace; font-size: .63rem">${d.replace(/[\u00A0-\u9999<>\&]/gim, e => `&#${e.charCodeAt(0)};`)}</pre>`;
+      }
+  });
 }
 
 function toUp() {
@@ -368,7 +374,18 @@ onMounted(() => {
 
       <div class="tabs">
         <div role="tabpanel">
-          <Files :list="list.filter(e => e.name.replaceAll('-', ' ').toLowerCase().startsWith(searchQuery.toLowerCase()))" :open-repo="openRepo" :open-file="openFile" :open-file-on-new-window="openFileOnNewWindow" :set-path="setPath" />
+          <Files 
+            :list="list.filter(
+              e => e
+                    .name
+                    .replaceAll('-', ' ').
+                    toLowerCase().
+                    startsWith(searchQuery.toLowerCase())
+            )" 
+            :open-repo="openRepo" 
+            :open-file="openFile" 
+            :set-path="setPath"
+          />
         </div>
       </div>
     </div>
@@ -378,8 +395,8 @@ onMounted(() => {
         <a :href="`https://github.com/${repo}`" target="_blank">{{ `https://github.com/${repo}` }}</a>
       </p>
       <p class="status-bar-field" style="text-align: center;">
-        <button @click="clearCache" style="min-width: 20px !important; zoom: 0.6; padding: 0; border: none; background: none;" class="clear-cache-button" title="Clear cache">
-          <img src="./assets/clear-cache.png" alt="Clear cache" :class="{ 'cache-clearing' :cacheClearing }" style="width: 20px; height: 20px;">
+        <button @click="clearCache" class="clear-cache-button" title="Clear cache">
+          <img src="./assets/clear-cache.png" alt="Clear cache" :class="{ 'cache-clearing' :cacheClearing }">
         </button>  
       </p>
     </div>
@@ -454,6 +471,19 @@ onMounted(() => {
 
 [role=tabpanel] {
   padding: 0;
+}
+
+.clear-cache-button {
+  min-width: 20px !important;
+  zoom: 0.6;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.clear-cache-button img {
+  width: 20px;
+  height: 20px;
 }
 
 @keyframes spinning {

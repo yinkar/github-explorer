@@ -3,58 +3,69 @@ defineProps({
   list: Array,
   openRepo: Function,
   openFile: Function,
-  openFileOnNewWindow: Function,
   setPath: Function,
 });
+
+function isExtension(name, extensions) {
+  return extensions.includes(name.split('.').filter(e => e).at(-1));
+}
 </script>
 
 <template>
   <ul class="files">
     <li v-for="item in list">
       
-      <div class="repo" v-if="item.type === 'repo'" @click="openRepo(item.path)" :title="item.name">
+      <div class="repo" 
+        v-if="item.type === 'repo'" 
+        @click="openRepo(item.path)" 
+        :title="item.name"
+      >
         <img src="../assets/repo.png" :alt="item.name">
         <div class="file-name">
             {{ item.name }}
         </div>
       </div>
 
-      <div class="file" v-if="item.type === 'file' && [ 'png', 'jpg', 'jpeg', 'gif', 'svg', 'jfif', 'webp' ].includes(item.name.split('.').filter(e => e).at(-1))" @click="openFile(item.download_url, item.name)" :title="item.name">
-        <img :src="item.download_url" :alt="item.name" style="object-fit: cover;">
-        <div class="file-name">
-            {{ item.name }}
-        </div>
-      </div>
+      <div 
+        class="file" 
+        v-else-if="item.type === 'file'" 
+        @click="openFile(item.download_url, item.name)" 
+        :title="item.name"
+      >
+        <img 
+          v-if="isExtension(item.name, [ 
+            'png', 'jpg', 'jpeg', 'gif', 'svg', 'jfif', 'webp' 
+          ])" 
+          :src="item.download_url" 
+          :alt="item.name" 
+          style="object-fit: cover;"
+        >
 
-      <div class="file" v-else-if="item.type === 'file' && [ 'mp3', 'wav', 'ogg' ].includes(item.name.split('.').filter(e => e).at(-1))" @click="openFile(item.download_url, item.name)" :title="item.name">
-        <img src="../assets/audio-file.png" :alt="item.name">
-        <div class="file-name">
-            {{ item.name }}
-        </div>
-      </div>
+        <img 
+          v-else-if="isExtension(item.name, [ 
+            'mp3', 'wav', 'ogg' 
+          ])"
+          src="../assets/audio-file.png" 
+          :alt="item.name"
+        >
 
-      <div class="file" v-else-if="item.type === 'file' && [ 'pdf', 'doc', 'xls' ].includes(item.name.split('.').filter(e => e).at(-1))" @click="openFileOnNewWindow(item.download_url, item.name)" :title="item.name">
-        <img src="../assets/file.png" :alt="item.name">
-        <div class="file-name">
-            {{ item.name }}
-        </div>
-      </div>
+        <img 
+          v-else
+          src="../assets/file.png" 
+          :alt="item.name"
+        >
 
-      <div class="file" v-else-if="item.type === 'file' && [ 'ttf' ].includes(item.name.split('.').filter(e => e).at(-1))" @click="openFileOnNewWindow(item.download_url, item.name)" :title="item.name">
-        <img src="../assets/file.png" :alt="item.name">
-        <div class="file-name">
-            {{ item.name }}
-        </div>
-      </div>
-
-      <div class="file" v-else-if="item.type === 'file'" @click="openFile(item.download_url, item.name)" :title="item.name">
-        <img src="../assets/file.png" :alt="item.name">
         <div class="file-name">
             {{ item.name }}
         </div>
       </div>
       
-      <div class="dir" v-if="item.type === 'dir'" @click="setPath(item.path)" :title="item.name">
+      <div 
+        class="dir" 
+        v-else-if="item.type === 'dir'" 
+        @click="setPath(item.path)" 
+        :title="item.name"
+      >
         <img src="../assets/folder.png" :alt="item.name">
         <div class="file-name">
             {{ item.name }}
