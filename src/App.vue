@@ -168,11 +168,13 @@ function goAddress() {
 
 function openRepo(repoPath) {
   repoBox.value.value = repoPath;
+  searchQuery.value = '';
   goAddress();
 }
 
 function setPath(itemPath) {
   pathBox.value.value = itemPath;
+  searchQuery.value = '';
   goAddress();
 }
 
@@ -205,6 +207,9 @@ function openFile(url, name) {
         return;
       }
       else if ([ 'pdf', 'doc', 'xls' ].includes(fileExtension)) {
+        return;
+      }
+      else if ([ 'ttf' ].includes(fileExtension)) {
         return;
       }
       
@@ -263,18 +268,17 @@ function clearCache() {
   }, 1000);
 }
 
-function search(e) {
-  console.log(searchQuery.value);
-}
-
 onMounted(() => {
-  if (window.location.hash !== '') {
-    const hashArray = window.location.hash.substring(1).split('/');
+  const setAddressByHash = () => {
 
-    if (hashArray.length < 1) return;
+    if (window.location.hash !== '') {
+      const hashArray = window.location.hash.substring(1).split('/');
 
-    pathBox.value.value = hashArray.splice(2).join('/');
-    repoBox.value.value = hashArray.join('/');
+      if (hashArray.length < 1) return;
+
+      pathBox.value.value = hashArray.splice(2).join('/');
+      repoBox.value.value = hashArray.join('/');
+    }
   }
 
   goAddress();
@@ -294,6 +298,11 @@ onMounted(() => {
       positionX.value = 0;
       positionY.value = 0;
     }
+  });
+  
+  window.addEventListener('hashchange', () => {
+    setAddressByHash();
+    goAddress();
   });
 });
 
@@ -348,7 +357,7 @@ onMounted(() => {
       <div class="search-bar-container field-row">
         <div class="input-group">
           <label for="repo">Search: </label>
-          <input type="text" ref="searchBox" @input="search" v-model="searchQuery"
+          <input type="text" ref="searchBox" v-model="searchQuery"
             id="search">
         </div>
       </div>

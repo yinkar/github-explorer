@@ -40,6 +40,13 @@ defineProps({
         </div>
       </div>
 
+      <div class="file" v-else-if="item.type === 'file' && [ 'ttf' ].includes(item.name.split('.').filter(e => e).at(-1))" @click="openFileOnNewWindow(item.download_url, item.name)" :title="item.name">
+        <img src="../assets/file.png" :alt="item.name">
+        <div class="file-name">
+            {{ item.name }}
+        </div>
+      </div>
+
       <div class="file" v-else-if="item.type === 'file'" @click="openFile(item.download_url, item.name)" :title="item.name">
         <img src="../assets/file.png" :alt="item.name">
         <div class="file-name">
