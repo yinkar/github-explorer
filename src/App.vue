@@ -24,6 +24,7 @@ const path = ref('');
 const address = ref('');
 const content = ref('');
 const previewTitle = ref('');
+const isImage = ref(false);
 
 const searchQuery = ref('');
 
@@ -193,14 +194,13 @@ function openFile(url, name) {
        window.open(url, encodeURI(`file-${name}`));
       }
 
+      isImage.value = false;
+
       if ([ 'png', 'jpg', 'jpeg', 'gif', 'svg', 'jfif', 'webp' ].includes(fileExtension)) {
         setPreview();
 
-        content.value = `
-          <div style="width: 100%; height: 100%;">
-            <img src="${url}">  
-          </div>
-        `;
+        content.value = url;
+        isImage.value = true;
       }
       else if ([ 'mp3', 'wav', 'ogg' ].includes(fileExtension)) {
         setPreview();
@@ -401,7 +401,7 @@ onMounted(() => {
     </div>
   </div>
 
-  <Preview v-if="preview" :preview="preview" :close-preview="closePreview" :content="content" :title="previewTitle" />
+  <Preview v-if="preview" :preview="preview" :close-preview="closePreview" :content="content" :title="previewTitle" :is-image="isImage" />
 
   <Alert v-if="error" :error="error" :close-alert="closeAlert" />
 </template>

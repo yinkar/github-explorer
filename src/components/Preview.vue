@@ -2,11 +2,14 @@
 import { ref, onMounted } from 'vue';
 import { drag } from '../draggable';
 
+import PreviewImage from './PreviewImage.vue';
+
 defineProps({
   preview: Boolean,
   closePreview: Function,
   content: String,
   title: String,
+  isImage: Boolean,
 });
 
 const previewPopup = ref(null);
@@ -41,7 +44,9 @@ onMounted(() => {
       </div>
     </div>
     <div class="window-body">
-      <iframe :srcdoc="content" frameborder="0" :style="{ pointerEvents: moveActive ? 'none' : 'all' }"></iframe>
+      <PreviewImage :url="content" :name="title" v-if="isImage" />
+
+      <iframe :srcdoc="content" frameborder="0" :style="{ pointerEvents: moveActive ? 'none' : 'all' }" v-else></iframe>
     </div>
   </div>
 </template>
