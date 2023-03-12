@@ -276,7 +276,6 @@ function clearCache() {
 
 onMounted(() => {
   const setAddressByHash = () => {
-
     if (window.location.hash !== '') {
       const hashArray = window.location.hash.substring(1).split('/');
 
@@ -286,7 +285,7 @@ onMounted(() => {
       repoBox.value.value = hashArray.join('/');
     }
   }
-
+  setAddressByHash();
   goAddress();
 
   const boundingRect = main.value.getBoundingClientRect();
