@@ -379,7 +379,7 @@ onMounted(() => {
                     .name
                     .replaceAll('-', ' ').
                     toLowerCase().
-                    startsWith(searchQuery.toLowerCase())
+                    includes(searchQuery.toLowerCase())
             )" 
             :open-repo="openRepo" 
             :open-file="openFile" 
