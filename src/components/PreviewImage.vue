@@ -26,6 +26,7 @@ const toggleZoom = () => zoom.value = !zoom.value;
   align-items: center;
   justify-content: center;
   overflow: auto;
+  cursor: zoom-out;
 }
 
 .image {
@@ -37,6 +38,7 @@ const toggleZoom = () => zoom.value = !zoom.value;
   text-align: unset;
   justify-content: flex-start;
   align-items: flex-start;
+  cursor: zoom-in;
 }
 
 .zoom .image {
